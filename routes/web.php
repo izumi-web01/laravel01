@@ -16,6 +16,7 @@ use App\Http\Controllers\TaskController;
 //     return view('welcome');
 // });
 Route::get('/', 'HomeController@index');
+// Route::get('/sample', 'TaskController');
 
 Auth::routes();
 

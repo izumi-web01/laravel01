@@ -7,12 +7,13 @@
             <button type="submit">追加する</button>
 
         </form>
-        
+        @auth
         <table>
             <tbody>
                 <tr>
                     タスク
                 </tr>
+                
                 @foreach( $tasks as $task )
                 <tr>
                     <td>
@@ -64,6 +65,7 @@
                 @endforeach
             </tbody>
         </table>
+        @endauth
 
     <script>
         function deleteTask(){
