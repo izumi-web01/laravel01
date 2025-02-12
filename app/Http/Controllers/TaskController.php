@@ -4,12 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use App\Task;
 use App\DataTransferObjects\Collections\TaskCollection;
 use DateTime;
+use App\Traits\AuthTrait;
+
 
 class TaskController extends Controller
 {
+
+    use AuthTrait;
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+    
     /**
      * Display a listing of the resource.
      *
@@ -17,22 +28,21 @@ class TaskController extends Controller
      */
     public function index()
     {
-        
-    // ログインユーザーの ID を取得
-    $user_id = auth()->id();
-    if(isset($user_id)){
-        $tasks = Task::where('status', false)->where('user_id', $user_id)->orderBy('updated_at', 'desc')->get();// collectionが返る
+        $loginUser = $this->getLoginUser(); // Traits のメソッドを呼び出す
+
+    if($loginUser){
+        $tasks = Task::where('status', false)->where('user_id', $loginUser->id)->orderBy('updated_at', 'desc')->get();// collectionが返る
         $arrays = $tasks->toArray();// 配列に変換
         $tasks = new TaskCollection($arrays);// インスタンス生成
-        $tasksFinished = Task::where('status', true)->where('user_id', $user_id)->orderBy('updated_at', 'desc')->get();
+        $tasksFinished = Task::where('status', true)->where('user_id', $loginUser->id)->orderBy('updated_at', 'desc')->get();
         $arraysFinished = $tasksFinished->toArray();
         $tasksFinished = new TaskCollection($arraysFinished);
     }
 
         return view('tasks.index', [
             'msg' => 'これはtasks.index.blade.phpです',
-            'tasks' => isset($user_id) ? $tasks->toArray() : '',// TaskContentのインスタンスの配列を生成
-            'tasksFinished' => isset($user_id) ? $tasksFinished->toArray() : '',
+            'tasks' => isset($loginUser) ? $tasks->toArray() : '',// TaskContentのインスタンスの配列を生成
+            'tasksFinished' => isset($loginUser) ? $tasksFinished->toArray() : '',
         ]);
         
     }
@@ -42,7 +52,29 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function sample(){
+    public function sample(Request $request){
+        // ゲスト ID を取得
+        if (! $request->session()->has('guest_id')) {
+            $guest_id = Str::uuid(); // UUID を生成
+            $request->session()->put('guest_id', $guest_id); // セッションに保存
+        } else {
+            $guest_id = $request->session()->get('guest_id');
+        }
+    
+        $tasks = Task::where('status', false)->where('guest_id', $guest_id)->orderBy('updated_at', 'desc')->get();// collectionが返る
+        $arrays = $tasks->toArray();// 配列に変換
+        $tasks = new TaskCollection($arrays);// インスタンス生成
+        $tasksFinished = Task::where('status', true)->where('guest_id', $guest_id)->orderBy('updated_at', 'desc')->get();
+        $arraysFinished = $tasksFinished->toArray();
+        $tasksFinished = new TaskCollection($arraysFinished);
+    // }
+
+        return view('tasks.sample', [
+            'msg' => 'これはtasks.sample.blade.phpです',
+            'tasks' => $tasks->toArray(),// TaskContentのインスタンスの配列を生成
+            'tasksFinished' => $tasksFinished->toArray(),
+            'guest_id' => $guest_id
+        ]);
         
     }
 
@@ -70,11 +102,21 @@ class TaskController extends Controller
         $task = new Task;
         // ログインユーザーの ID を取得
         $user_id = auth()->id();
-        $task->user_id = $user_id;
+        if (auth()->check()) {
+            $task->user_id = auth()->id();
+        } else {
+            // ゲストユーザーの場合
+            $task->guest_id = $request->input('guest_id'); // ゲストIDを保存
+        }
         $task_name = $request->input('task_name');
         $task->name = $task_name;
         $task->save();
-        return redirect('/tasks');
+        if (auth()->check()){
+            $redirectTo = '/tasks';
+        }else{
+            $redirectTo = '/sample';
+        }
+        return redirect($redirectTo);
     }
 
     /**

@@ -4,20 +4,18 @@
         <form method="POST" action="/tasks">
             @csrf
             <input type="text" name="task_name" placeholder="洗濯する、とか。">
+            <input type="hidden" name="guest_id" value={{ $guest_id }}>
             <button type="submit">追加する</button>
 
         </form>
-        @if($loginUser)
-        <p>こんにちは</p>
-        
-        @else
-        <p>おなかすいた</p>
-        @endif
-        @auth
+        {{-- @if(loginUser)
+        こんにちは
+        @endif --}}
+        {{-- @auth --}}
         <table>
             <tbody>
                 <tr>
-                    <p>{{ $loginUserName }}さんのタスク</p>
+                    タスク
                 </tr>
 
                 @foreach( $tasks as $task )
@@ -71,7 +69,7 @@
                 @endforeach
             </tbody>
         </table>
-        @endauth
+        {{-- @endauth --}}
 
     <script>
         function deleteTask(){

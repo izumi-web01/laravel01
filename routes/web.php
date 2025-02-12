@@ -23,3 +23,5 @@ Auth::routes();
 // Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/list', 'TodoListController@index');
 Route::resource('tasks', 'TaskController');
+Route::get('/sample', 'TaskController@sample');
+// Route::post('/sample', 'TaskController@store');

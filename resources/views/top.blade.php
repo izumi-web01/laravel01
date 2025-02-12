@@ -19,7 +19,7 @@
                     <a href="{{ route('register') }}">無料登録する</a>
                     <p>登録済みの方はこちら</p>
                     <a href="{{ route('login') }}">ログイン</a>
-                    <p><a href="{{ url('/tasks') }}">ログインせずに試す</a></p>
+                    <p><a href="{{ url('/sample') }}">ログインせずに試す</a></p>
                     {{-- モーダルここまで --}}
                     
                     
