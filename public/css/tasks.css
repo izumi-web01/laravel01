@@ -1,0 +1,12 @@
+.ttl {
+  font-size: 26px;
+  font-weight: bold;
+  text-align: center;
+  margin: 50px 0;
+}
+
+.tasks__form {
+  width: 50%;
+  margin: 0 auto 50px;
+}
+

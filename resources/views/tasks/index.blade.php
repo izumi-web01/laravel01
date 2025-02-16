@@ -1,12 +1,16 @@
 
 @extends('layouts.app')
 @section('content')
+<div class="container">
+    <h2 class="ttl">今日は何する？</h2>
+    <div class="tasks__form">   
         <form method="POST" action="/tasks">
             @csrf
             <input type="text" name="task_name" placeholder="洗濯する、とか。">
             <button type="submit">追加する</button>
 
         </form>
+    </div>
         @if($loginUser)
         <p>こんにちは</p>
         
@@ -72,6 +76,7 @@
             </tbody>
         </table>
         @endauth
+</div>
 
     <script>
         function deleteTask(){
