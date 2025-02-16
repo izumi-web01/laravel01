@@ -6,7 +6,7 @@
     <div class="tasks__form">   
         <form method="POST" action="/tasks">
             @csrf
-            <input type="text" name="task_name" placeholder="洗濯する、とか。">
+            <input class="tasks__form_name"type="text" name="task_name" placeholder="洗濯する、とか。">
             <button type="submit">追加する</button>
 
         </form>

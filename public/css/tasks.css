@@ -6,7 +6,14 @@
 }
 
 .tasks__form {
-  width: 50%;
+  width: -moz-fit-content;
+  width: fit-content;
   margin: 0 auto 50px;
+}
+
+.tasks__form_name {
+  width: 400px;
+  padding: 10px;
+  margin-right: 20px;
 }
 
