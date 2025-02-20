@@ -2,6 +2,8 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
+    <p>{{ $loginUser ? $loginUser['name'] : 'ゲスト'}}さん、こんにちは。</p>
+    <p>{{ $loginUser ? $loginUser['loginUser']->name : 'ゲスト'}}さん、こんにちは。</p>
     <h2 class="ttl">今日は何する？</h2>
     <div class="tasks__form">   
         <form method="POST" action="/tasks">
@@ -11,17 +13,17 @@
 
         </form>
     </div>
-        @if($loginUser)
+        {{-- @if($loginUser)
         <p>こんにちは</p>
         
         @else
         <p>おなかすいた</p>
-        @endif
+        @endif --}}
         @auth
         <table>
             <tbody>
                 <tr>
-                    <p>{{ $loginUserName }}さんのタスク</p>
+                    <p>{{ $loginUser['name']}}さんのタスク</p>
                 </tr>
 
                 @foreach( $tasks as $task )

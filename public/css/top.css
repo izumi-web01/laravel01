@@ -1,0 +1,23 @@
+.card__ttl {
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.mdl {
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.5s;
+}
+
+.mdl.js-noclick {
+  transform: translateY(50px);
+}
+
+.mdl.is-visible {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
