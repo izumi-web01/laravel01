@@ -6,7 +6,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">トップページ</div>
-                <p>{{ $loginUser ? $loginUser['namae'] : 'ゲスト'}}　さん、こんにちは。</p>
+                <p>{{ isset($loginUser) ? $loginUser['name'] : 'ゲスト'}}　さん、こんにちは。</p>
 
                 <div class="card-body">
                     @if (session('status'))

@@ -1,31 +1,31 @@
 
 @extends('layouts.app')
 @section('content')
-<div class="container">
-    <p>{{ $loginUser ? $loginUser['name'] : 'ゲスト'}}さん、こんにちは。</p>
-    <p>{{ $loginUser ? $loginUser['loginUser']->name : 'ゲスト'}}さん、こんにちは。</p>
-    <h2 class="ttl">今日は何する？</h2>
-    <div class="tasks__form">   
-        <form method="POST" action="/tasks">
-            @csrf
-            <input class="tasks__form_name"type="text" name="task_name" placeholder="洗濯する、とか。">
-            <button type="submit">追加する</button>
 
-        </form>
-    </div>
-        {{-- @if($loginUser)
-        <p>こんにちは</p>
-        
-        @else
-        <p>おなかすいた</p>
-        @endif --}}
-        @auth
+
+@auth
+    <div class="container">
+        <p>{{ isset($loginUser) ? $loginUser['name'] : 'ゲスト'}}さん、こんにちは。</p>
+        <h2 class="ttl">今日は何する？</h2>
+        <div class="tasks__form">   
+            <form method="POST" action="/tasks">
+                @csrf
+                <input class="tasks__form_name" type="text" name="task_name" placeholder="洗濯する、とか。">
+                <input type="hidden" name="type" value="member">
+                @if($errors->any())
+                    @foreach($errors->get('task_name') as $message)
+                        <p class="has-error">{{ $message }}</p>
+                    @endforeach
+                @endif
+                <button type="submit">追加する</button>
+
+            </form>
+        </div>
+    
+        @if($tasks)
+        <h3>{{ $loginUser['name']}}さんのタスク</h3>
         <table>
             <tbody>
-                <tr>
-                    <p>{{ $loginUser['name']}}さんのタスク</p>
-                </tr>
-
                 @foreach( $tasks as $task )
                 <tr>
                     <td>
@@ -55,9 +55,10 @@
                 @endforeach
             </tbody>
         </table>
-
+        @endif
+        @if($tasksFinished)
+        <h3>{{ $loginUser['name']}}さんの完了したタスク</h3>
         <table>
-            <p>完了したタスク</p>
             <tbody>
                 @foreach($tasksFinished as $task)
                 <tr>
@@ -77,8 +78,9 @@
                 @endforeach
             </tbody>
         </table>
-        @endauth
-</div>
+        @endif
+    
+    </div>
 
     <script>
         function deleteTask(){
@@ -89,4 +91,10 @@
             }
         }
     </script>
+@else
+    <div class="container">
+        <h2>ログインしてからお試しください</h2>
+    </div>
+@endauth
 @endsection
+

@@ -9,12 +9,16 @@ use App\Task;
 use App\DataTransferObjects\Collections\TaskCollection;
 use DateTime;
 use App\Traits\AuthTrait;
+use App\Traits\RedirectToTrait;
+use Illuminate\Support\Facades\URL;
+use App\Http\Requests\TaskRequest;
 
 
 class TaskController extends Controller
 {
 
-    use AuthTrait;
+    // use AuthTrait;
+    use RedirectToTrait;
 
     public function __construct()
     {
@@ -28,28 +32,31 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $loginUser = $this->getLoginUser(); // Traits のメソッドを呼び出す
+        // $loginUser = $this->getLoginUser(); // Traits のメソッドを呼び出す
+        $logedIn = Auth::user();
 
-    if($loginUser){
-        $tasks = Task::where('status', false)->where('user_id', $loginUser->id)->orderBy('updated_at', 'desc')->get();// collectionが返る
+    if($logedIn){
+        
+        $tasks = Task::where('status', false)->where('user_id', $logedIn->id)->orderBy('updated_at', 'desc')->get();// collectionが返る
         $arrays = $tasks->toArray();// 配列に変換
         $tasks = new TaskCollection($arrays);// インスタンス生成
-        $tasksFinished = Task::where('status', true)->where('user_id', $loginUser->id)->orderBy('updated_at', 'desc')->get();
+        $tasksFinished = Task::where('status', true)->where('user_id', $logedIn->id)->orderBy('updated_at', 'desc')->get();
         $arraysFinished = $tasksFinished->toArray();
         $tasksFinished = new TaskCollection($arraysFinished);
+
     }
 
         return view('tasks.index', [
             'msg' => 'これはtasks.index.blade.phpです',
-            'tasks' => isset($loginUser) ? $tasks->toArray() : '',// TaskContentのインスタンスの配列を生成
-            'tasksFinished' => isset($loginUser) ? $tasksFinished->toArray() : '',
+            'tasks' => isset($logedIn) ? $tasks->toArray() : '',// TaskContentのインスタンスの配列を生成
+            'tasksFinished' => isset($logedIn) ? $tasksFinished->toArray() : '',
         ]);
         
     }
 
     /**
      * Display a demonstration.
-     *
+     *ログインせずゲストIDでデモンストレーションする処理
      * @return \Illuminate\Http\Response
      */
     public function sample(Request $request){
@@ -94,7 +101,7 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(TaskRequest $request)
     {
         // 入力値をDBに保存する
         
@@ -102,6 +109,7 @@ class TaskController extends Controller
         $task = new Task;
         // ログインユーザーの ID を取得
         $user_id = auth()->id();
+        $type = $request->input('type');
         if (auth()->check()) {
             $task->user_id = auth()->id();
         } else {
@@ -111,11 +119,7 @@ class TaskController extends Controller
         $task_name = $request->input('task_name');
         $task->name = $task_name;
         $task->save();
-        if (auth()->check()){
-            $redirectTo = '/tasks';
-        }else{
-            $redirectTo = '/sample';
-        }
+        $redirectTo = $this->getRedirectTo();
         return redirect($redirectTo);
     }
 
@@ -139,6 +143,7 @@ class TaskController extends Controller
     public function edit($id)
     {
         //
+        
         $task = Task::find($id);
         
         return view('tasks.edit',[
@@ -152,22 +157,22 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
+     * 編集　/ 完了
      */
-    public function update(Request $request, $id)
+    public function update(TaskRequest $request, $id)
     {
-        //　編集　完了
-        if($request->status === null){
+
+        if($request->status === null){// 編集
             $task = Task::find($id);
             $task->name = $request->input('task_name');
             $task->save();
-        }else{
+        }else{// 完了
             $task = Task::find($id);
             $task->status = true;
             $task->save();
         }
-        
-        
-        return redirect('/tasks');
+        $redirectTo = $this->getRedirectTo();
+        return redirect($redirectTo);
     }
 
     /**
@@ -181,6 +186,7 @@ class TaskController extends Controller
         //
         $task = Task::find($id);
         $task->delete();
-        return redirect('/tasks');
+        $redirectTo = $this->getRedirectTo();
+        return redirect($redirectTo);
     }
 }

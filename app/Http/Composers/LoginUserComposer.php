@@ -9,17 +9,23 @@ class LoginUserComposer {
     public function compose(View $view){
         $loginUser = null;
         if(Auth::check()){
-            print 'ログインしています<br>';
-            $loginUser = Auth::user();
+            $login = Auth::user();
             $loginUser = [
-                'loginUser' => $loginUser,
-                'name' => $loginUser->name,
-                'email' => $loginUser->email,
-                'id' => $loginUser->id,
+                // 'loginUser' => $loginUser,
+                'name' => $login->name,
+                'email' => $login->email,
+                'id' => $login->id,
             ];
+            $view->with([
+                'loginUser'=>$loginUser
+            ]);
         }else{
             print 'ログインしていません<br>';
+            $guestUser  = 'ゲスト';
+            $view->with([
+                'guestUser'=>$guestUser
+            ]);
         }
-        $view->with('loginUser', $loginUser);
+        
     }
 }
